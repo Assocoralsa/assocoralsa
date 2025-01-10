@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador ASSOCORALSA</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: cardEnter 0.6s ease-out;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #f3f4f6;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .input-section {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .monto-input {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .monto-input span {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .monto-input input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .monto-input input:focus {
+            outline: none;
+            border-color: #FFB800;
+            box-shadow: 0 0 0 3px rgba(255,184,0,0.1);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .plazo-section {
+            margin-top: 2rem;
+        }
+
+        .plazo-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .plazo-button {
+            padding: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .plazo-button:hover {
+            border-color: #FFB800;
+            color: #FFB800;
+        }
+
+        .plazo-button.active {
+            background: #FFB800;
+            border-color: #FFB800;
+            color: white;
+        }
+
+        .cuota-display {
+            text-align: center;
+            padding: 2rem;
+            margin: 2rem 0;
+            background: linear-gradient(135deg, #FFB800, #FFA500);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .cuota-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .cuota-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .tasa-info {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .tabla-amortizacion {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 0.75rem;
+            text-align: left;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .btn-continuar {
+            width: 100%;
+            padding: 1rem;
+            background: #FFB800;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 2rem;
+        }
+
+        .btn-continuar:hover {
+            background: #FFA500;
+            transform: translateY(-2px);
+        }
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .plazo-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="card">
+                <div class="header">
+                    <button class="back-button" @click="goBack">
+                        ← Atrás
+                    </button>
+                    <h1 class="title">Cotizador de Préstamos</h1>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Monto del préstamo</label>
+                    <div class="monto-input">
+                        <span>Q</span>
+                        <input 
+                            type="number" 
+                            v-model="monto"
+                            @input="validateMonto"
+                            placeholder="Ingrese el monto"
+                        >
+                    </div>
+                    <p v-if="montoError" class="error-message">{{ montoError }}</p>
+                    <p class="input-label">Monto permitido: Q500 - Q15,000</p>
+                </div>
+
+                <div class="plazo-section">
+                    <label class="input-label">Plazo en meses</label>
+                    <div class="plazo-grid">
+                        <button 
+                            v-for="p in plazosDisponibles" 
+                            :key="p"
+                            :class="['plazo-button', { active: plazo === p }]"
+                            @click="plazo = p"
+                        >
+                            {{ p }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cuota-display">
+                    <p class="cuota-label">Cuota mensual estimada</p>
+                    <p class="cuota-amount">Q{{ cuotaMensual.toFixed(2) }}</p>
+                    <p class="tasa-info">Tasa anual: {{ isSocio ? '12%' : '13%' }}</p>
+                </div>
+
+                <div class="tabla-amortizacion">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Cuota</th>
+                                <th>Capital</th>
+                                <th>Interés</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="pago in tablaPagos" :key="pago.mes">
+                                <td>{{ pago.mes }}</td>
+                                <td>Q{{ pago.cuota }}</td>
+                                <td>Q{{ pago.capital }}</td>
+                                <td>Q{{ pago.interes }}</td>
+                                <td>Q{{ pago.saldo }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn-continuar" @click="continuarFormulario">
+                    Continuar con la solicitud
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    monto: '',
+                    plazo: 3,
+                    montoError: '',
+                    isSocio: false, // Este valor vendría de la pantalla anterior
+                    tablaPagos: []
+                }
+            },
+            computed: {
+                plazosDisponibles() {
+                    const maxPlazo = this.getPlazoMaximo();
+                    return [3, 6, 8, 12, 16, 24, 30, 36].filter(p => p <= maxPlazo);
+                },
+                cuotaMensual() {
+                    if (!this.monto || this.montoError) return 0;
+                    return this.calcularCuota();
+                }
+            },
+            methods: {
+                getPlazoMaximo() {
+                    const monto = Number(this.monto);
+                    if (monto <= 2500) return 12;
+                    if (monto <= 5000) return 18;
+                    if (monto <= 7500) return 24;
+                    if (monto <= 10000) return 30;
+                    return 36;
+                },
+                validateMonto() {
+                    const monto = Number(this.monto);
+                    if (isNaN(monto)) {
+                        this.montoError = 'Ingrese un monto válido';
+                        return false;
+                    }
+                    if (monto < 500) {
+                        this.montoError = 'El monto mínimo es Q500';
+                        return false;
+                    }
+                    if (monto > 15000) {
+                        this.montoError = 'El monto máximo es Q15,000';
+                        return false;
+                    }
+                    this.montoError = '';
+                    this.generarTablaPagos();
+                    return true;
+                },
+                calcularCuota() {
+                    const tasaAnual = this.isSocio ? 0.12 : 0.13;
+                    const tasaMensual = tasaAnual / 12;
+                    return this.monto * (tasaMensual * Math.pow(1 + tasaMensual, this.plazo)) / 
+                           (Math.pow(1 + tasaMensual, this.plazo) - 1);
+                },
+                generarTablaPagos() {
+                    if (!this.monto || this.montoError) {
+                        this.tablaPagos = [];
+                        return;
+                    }
+
+                    const tasaAnual = this.isSocio ? 0.12 : 0.13;
+                    const tasaMensual = tasaAnual / 12;
+                    const cuotaMensual = this.calcularCuota();
+                    let saldo = Number(this.monto);
+                    const pagos = [];
+
+                    for (let i = 1; i <= this.plazo; i++) {
+                        const interesMes = saldo * tasaMensual;
+                        const capitalMes = cuotaMensual - interesMes;
+                        saldo -= capitalMes;
+                        
+                        pagos.push({
+                            mes: i,
+                            cuota: cuotaMensual.toFixed(2),
+                            interes: interesMes.toFixed(2),
+                            capital: capitalMes.toFixed(2),
+                            saldo: Math.max(0, saldo).toFixed(2)
+                        });
+                    }
+
+                    this.tablaPagos = pagos;
+                },
+                goBack() {
+                    window.location.href = 'inicio.html';
+                },
+                continuarFormulario() {
+                    if (!this.monto || this.montoError) {
+                        alert('Por favor, ingrese un monto válido');
+                        return;
+                    }
+                    // Aquí iría la lógica para continuar al formulario
+                      window.location.href = 'formulario.html';
+                }
+            },
+            watch: {
+                plazo() {
+                    this.generarTablaPagos();
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

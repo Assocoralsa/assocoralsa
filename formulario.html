@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Formulario ASSOCORALSA</title>
+   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+   <style>
+
+  /* Evitar saltos de página no deseados */
+    #formContent {
+        page-break-inside: avoid;
+    }
+    .section-title, .form-group {
+        page-break-inside: avoid;
+    }
+
+
+
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           font-family: 'Poppins', sans-serif;
+       }
+
+       body {
+           background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+           min-height: 100vh;
+       }
+
+       .container {
+           padding: 1rem;
+           max-width: 600px;
+           margin: 0 auto;
+       }
+
+       .form-card {
+           background: white;
+           border-radius: 16px;
+           padding: 2rem;
+           box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+           margin-bottom: 2rem;
+       }
+
+       .header {
+           text-align: center;
+           margin-bottom: 2rem;
+           padding-bottom: 1rem;
+           border-bottom: 2px solid #FFB800;
+       }
+
+       .section-title {
+           font-size: 1.2rem;
+           color: #1a1a1a;
+           margin: 1.5rem 0 1rem;
+           padding-left: 1rem;
+           border-left: 4px solid #FFB800;
+       }
+
+       .form-group {
+           margin-bottom: 1rem;
+       }
+
+       label {
+           display: block;
+           font-size: 0.9rem;
+           color: #64748b;
+           margin-bottom: 0.5rem;
+       }
+
+       input, select {
+           width: 100%;
+           padding: 0.75rem;
+           border: 2px solid #e2e8f0;
+           border-radius: 8px;
+           font-size: 1rem;
+           transition: all 0.3s;
+       }
+
+       input:focus, select:focus {
+           outline: none;
+           border-color: #FFB800;
+           box-shadow: 0 0 0 3px rgba(255,184,0,0.1);
+       }
+
+       .grid-2 {
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 1rem;
+       }
+
+       .grid-3 {
+           display: grid;
+           grid-template-columns: 1fr 1fr 1fr;
+           gap: 1rem;
+       }
+
+       .file-upload {
+           border: 2px dashed #e2e8f0;
+           padding: 2rem;
+           text-align: center;
+           border-radius: 8px;
+           cursor: pointer;
+           transition: all 0.3s;
+       }
+
+       .file-upload:hover {
+           border-color: #FFB800;
+           background: rgba(255,184,0,0.05);
+       }
+
+       .file-info {
+           margin-top: 1rem;
+           font-size: 0.9rem;
+           color: #64748b;
+       }
+
+       .actions {
+           display: flex;
+           gap: 1rem;
+           margin-top: 2rem;
+       }
+
+       .btn {
+           flex: 1;
+           padding: 1rem;
+           border: none;
+           border-radius: 8px;
+           font-weight: 600;
+           cursor: pointer;
+           transition: all 0.3s;
+       }
+
+       .btn-back {
+           background: #f1f5f9;
+           color: #64748b;
+       }
+
+       .btn-back:hover {
+           background: #e2e8f0;
+       }
+
+       .btn-submit {
+           background: #FFB800;
+           color: white;
+       }
+
+       .btn-submit:hover {
+           background: #FFA500;
+       }
+
+       .authorization {
+           background: #f8fafc;
+           padding: 1.5rem;
+           border-radius: 8px;
+           margin: 2rem 0;
+           font-size: 0.9rem;
+           line-height: 1.6;
+       }
+
+       .company-input {
+           border: none;
+           border-bottom: 2px solid #FFB800;
+           background: #f8fafc;
+           padding: 0.5rem;
+           margin: 0.5rem 0;
+           width: 100%;
+           text-align: center;
+       }
+
+       .signatures {
+           margin-top: 2rem;
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 2rem;
+           text-align: center;
+       }
+
+       .signature-line {
+           border-top: 2px solid #e2e8f0;
+           padding-top: 0.5rem;
+           margin-top: 3rem;
+       }
+
+       @media (max-width: 640px) {
+           .container {
+               padding: 0.5rem;
+           }
+
+           .form-card {
+               padding: 1.5rem;
+           }
+
+           .grid-2, .grid-3 {
+               grid-template-columns: 1fr;
+           }
+
+           .signatures {
+               grid-template-columns: 1fr;
+               gap: 1rem;
+           }
+       }
+   </style>
+</head>
+<body>
+   <div id="app">
+       <div class="container">
+           <div class="form-card" id="formContent">
+               <div class="header">
+                   <h1>SOLICITUD DE ANTICIPO EXTRAORDINARIO</h1>
+                   <p>ASOCIACIÓN SOLIDARISTA DE TRABAJADORES DE CORALSA</p>
+               </div>
+
+               <div class="section-title">Información Personal</div>
+               <div class="form-group">
+                   <label>Departamento o Municipio</label>
+                   <input type="text" v-model="formData.departamento">
+               </div>
+
+               <div class="grid-3">
+                   <div class="form-group">
+                       <label>Día</label>
+                       <input type="text" v-model="formData.dia" :value="currentDate.day" readonly>
+                   </div>
+                   <div class="form-group">
+                       <label>Mes</label>
+                       <input type="text" v-model="formData.mes" :value="currentDate.month" readonly>
+                   </div>
+                   <div class="form-group">
+                       <label>Año</label>
+                       <input type="text" v-model="formData.anio" :value="currentDate.year" readonly>
+                   </div>
+               </div>
+
+               <div class="grid-2">
+                   <div class="form-group">
+                       <label>Nombre</label>
+                       <input type="text" v-model="formData.nombre">
+                   </div>
+                   <div class="form-group">
+                       <label>Código de Empleado</label>
+                       <input type="text" v-model="formData.codigoEmpleado">
+                   </div>
+               </div>
+
+               <div class="section-title">Información Laboral</div>
+               <div class="grid-2">
+                   <div class="form-group">
+                       <label>Empresa en la que labora</label>
+                       <input type="text" v-model="formData.empresa" placeholder='Ej: "Dream Team, S.A."'>
+                   </div>
+                   <div class="form-group">
+                       <label>Marca</label>
+                       <input type="text" v-model="formData.marca" placeholder='Little Caesar, Wendy´s o CAU Corporativo'>
+                   </div>
+               </div>
+
+               <div class="form-group">
+                   <label>Unidad</label>
+                   <input type="text" v-model="formData.unidad" placeholder="Ej: Contabilidad, Reclutamiento, Zona 9, etc.">
+               </div>
+
+               <div class="grid-2">
+                   <div class="form-group">
+                       <label>Teléfono 1 (celular)</label>
+                       <input type="tel" v-model="formData.telefono1">
+                   </div>
+                   <div class="form-group">
+                       <label>Teléfono 2 (otro)</label>
+                       <input type="tel" v-model="formData.telefono2">
+                   </div>
+               </div>
+
+               <div class="grid-3">
+                   <div class="form-group">
+                       <label>Ingreso Día</label>
+                       <input type="text" v-model="formData.fechaIngresoDia">
+                   </div>
+                   <div class="form-group">
+                       <label>Ingreso Mes</label>
+                       <input type="text" v-model="formData.fechaIngresoMes">
+                   </div>
+                   <div class="form-group">
+                       <label>Ingreso Año</label>
+                       <input type="text" v-model="formData.fechaIngresoAnio">
+                   </div>
+               </div>
+
+               <div class="section-title">Datos Bancarios</div>
+               <div class="form-group">
+                   <label>D.P.I.</label>
+                   <input type="text" v-model="formData.dpi">
+               </div>
+
+               <div class="grid-2">
+                   <div class="form-group">
+                       <label>Cuenta Monetaria</label>
+                       <input type="text" v-model="formData.cuentaMonetaria">
+                   </div>
+                   <div class="form-group">
+                       <label>Forma de Pago</label>
+                       <select v-model="formData.formaPago">
+                           <option value="banco">Banco Industrial</option>
+                           <option value="cheque">Emisión de Cheque</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="authorization">
+                   <p>
+                       En tal sentido, autorizo se deduzca de mi salario mensual la cantidad que corresponda; 
+                       y en caso termine mi relación laboral con la empresa
+                   </p>
+                   <input type="text" 
+                          class="company-input" 
+                          v-model="formData.empresaAutorizacion"
+                          placeholder='Dream Team, S.A.'>
+                   <p>
+                       para la cual trabajo, <strong>NO</strong> tengo inconveniente que se descuente de mi liquidación 
+                       cualquier saldo pendiente a favor de <strong>ASOCIACIÓN SOLIDARISTA DE TRABAJADORES DE CORALSA</strong>.
+                   </p>
+               </div>
+
+               <div class="section-title">Motivo del Anticipo</div>
+               <div class="form-group">
+                   <label>Favor ser lo más explícito posible sobre el uso de los fondos</label>
+                   <textarea 
+                       v-model="formData.motivoAnticipo"
+                       rows="4"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical;"
+                   ></textarea>
+               </div>
+
+               
+
+               <div class="signatures">
+                   <div>
+                       <div class="signature-line">Deudor</div>
+                   </div>
+                   <div>
+                       <div class="signature-line">V.B. Jefe Inmediato</div>
+                   </div>
+               </div>
+
+               <div class="actions">
+                   <button class="btn btn-back" @click="goBack">
+                       Atrás
+                   </button>
+                   <button class="btn btn-submit" @click="generatePDF">
+                       Generar PDF
+                   </button>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <script>
+       const { createApp } = Vue
+
+       createApp({
+           data() {
+               return {
+                   formData: {
+                       departamento: '',
+                       dia: '',
+                       mes: '',
+                       anio: '',
+                       nombre: '',
+                       codigoEmpleado: '',
+                       empresa: '',
+                       marca: '',
+                       unidad: '',
+                       telefono1: '',
+                       telefono2: '',
+                       fechaIngresoDia: '',
+                       fechaIngresoMes: '',
+                       fechaIngresoAnio: '',
+                       dpi: '',
+                       cuentaMonetaria: '',
+                       formaPago: 'banco',
+                       empresaAutorizacion: '',
+                       motivoAnticipo: '',
+                       files: []
+                   }
+               }
+           },
+           computed: {
+               currentDate() {
+                   const today = new Date();
+                   return {
+                       day: today.getDate(),
+                       month: today.getMonth() + 1,
+                       year: today.getFullYear()
+                   }
+               }
+           },
+           methods: {
+               triggerFileInput() {
+                   this.$refs.fileInput.click();
+               },
+               handleFileUpload(event) {
+                   this.formData.files = Array.from(event.target.files);
+               },
+               goBack() {
+                   window.location.href = 'cotizador.html';
+               },
+
+async generatePDF() {
+    const element = document.getElementById('formContent');
+    const opt = {
+        margin: 0,
+        filename: 'solicitud-anticipo.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+ pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+
+    try {
+        await html2pdf().from(element).set(opt).save();
+    } catch (error) {
+        console.error('Error al generar el PDF:', error);
+    }
+
+
+
+}
+
+           }
+       }).mount('#app')
+   </script>
+</body>
+</html>
